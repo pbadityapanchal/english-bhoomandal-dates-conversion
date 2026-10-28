@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Bhoomandal Rotation Holiday System</title>
+
+<!-- Bootstrap -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- GSAP -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+
+body{
+background:#f8f9fa;
+font-family: system-ui;
+overflow-x:hidden;
+}
+
+/* SAFFRON THEME */
+
+.saffron{
+color:#ff6f00;
+}
+
+.bg-saffron{
+background:linear-gradient(135deg,#ff6f00,#ffa726);
+color:white;
+}
+
+/* SPLIT SCREEN */
+
+.split{
+display:flex;
+min-height:400px;
+}
+
+.old-system{
+flex:1;
+background:#d6d6d6;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+}
+
+.new-system{
+flex:1;
+background:linear-gradient(135deg,#fff3e0,#ffe0b2);
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+}
+
+/* HOLIDAY ICON */
+
+.holiday{
+font-size:40px;
+padding:15px;
+border-radius:50%;
+background:#ff6f00;
+color:white;
+}
+
+/* CALENDAR GRID */
+
+.calendar{
+display:grid;
+grid-template-columns:repeat(7,1fr);
+gap:5px;
+max-width:400px;
+margin:auto;
+}
+
+.day{
+padding:10px;
+background:white;
+border-radius:5px;
+}
+
+.active-day{
+background:#ff6f00;
+color:white;
+font-weight:bold;
+}
+
+/* SCALE */
+
+.scale{
+font-size:80px;
+}
+
+/* QUIZ */
+
+.quiz-answer{
+display:none;
+}
+
+/* CTA */
+
+.cta{
+background:#ff6f00;
+color:white;
+padding:15px 40px;
+border:none;
+border-radius:30px;
+font-size:20px;
+transition:0.5s;
+}
+
+.cta:hover{
+box-shadow:0 0 20px #ff6f00;
+transform:scale(1.1);
+}
+
+/* BRIDGE */
+
+.bridge{
+font-size:40px;
+color:#ff6f00;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container py-5">
+
+<h1 class="text-center saffron mb-5">
+Rotation Holiday System
+</h1>
+
+
+<!-- SPLIT SCREEN -->
+
+<div class="split mb-5">
+
+<div class="old-system">
+
+<h4>दशकों से वही उबाऊ रविवार</h4>
+
+<div class="holiday" id="oldHoliday">Sunday</div>
+
+</div>
+
+<div class="new-system">
+
+<h4>हर वर्ष नई ऊर्जा</h4>
+
+<div class="holiday" id="newHoliday">Monday</div>
+
+</div>
+
+</div>
+
+
+<!-- ROTATION SLIDER -->
+
+<h3 class="text-center saffron">
+15-Year Rotation Calculator
+</h3>
+
+<input type="range" min="1" max="15" value="1"
+class="form-range"
+id="yearSlider">
+
+<p class="text-center">
+Year: <span id="yearValue">1</span>
+</p>
+
+<div class="calendar" id="calendar"></div>
+
+
+<!-- DHARM KARM SCALE -->
+
+<div class="text-center my-5">
+
+<div class="scale">⚖️</div>
+
+<p>
+
+स्थिर तारीखें कर्म संभालेंगी,<br>
+रोटेशन आपका धर्म संभालेगा।
+
+</p>
+
+</div>
+
+
+<!-- SATISFACTION CHART -->
+
+<h3 class="text-center saffron">
+Satisfaction Meter
+</h3>
+
+<canvas id="chart"></canvas>
+
+
+<!-- QUIZ -->
+
+<div class="card mt-5 p-4 text-center">
+
+<h4>
+क्या Same Day & Same Date pattern कितने वर्षों में लौटता है?
+</h4>
+
+<button class="btn btn-warning mt-3"
+onclick="showAnswer()">
+
+उत्तर देखें
+
+</button>
+
+<p class="quiz-answer mt-3">
+
+English Calendar: 28 years<br>
+Bhoomandal Calendar: 1 year logic
+
+</p>
+
+</div>
+
+
+<!-- PANCHANG BRIDGE -->
+
+<div class="text-center mt-5">
+
+<div class="bridge">
+📅 ⇄ 🕉️
+</div>
+
+<p>
+
+आधुनिक ढांचा, पारंपरिक आत्मा।<br>
+व्रत और त्योहारों के लिए पंचांग का अटूट साथ।
+
+</p>
+
+</div>
+
+
+<!-- CTA -->
+
+<div class="text-center mt-5">
+
+<button class="cta">
+
+Join the Revolution
+
+</button>
+
+</div>
+
+</div>
+
+
+<script>
+
+/* DAYS */
+
+const days = [
+"Sunday","Monday","Tuesday",
+"Wednesday","Thursday","Friday","Saturday"
+];
+
+
+/* ROTATION LOGIC */
+
+const slider = document.getElementById("yearSlider");
+const yearValue = document.getElementById("yearValue");
+const calendar = document.getElementById("calendar");
+const newHoliday = document.getElementById("newHoliday");
+
+
+function updateCalendar(year){
+
+calendar.innerHTML="";
+
+const holidayIndex = year % 7;
+
+days.forEach((day,index)=>{
+
+const div=document.createElement("div");
+
+div.className="day";
+
+div.innerText=day;
+
+if(index===holidayIndex){
+
+div.classList.add("active-day");
+
+newHoliday.innerText=day;
+
+/* GSAP PULSE */
+
+gsap.fromTo(newHoliday,
+{scale:1},
+{scale:1.3, duration:0.5, yoyo:true, repeat:1}
+);
+
+}
+
+calendar.appendChild(div);
+
+});
+
+}
+
+slider.oninput=function(){
+
+yearValue.innerText=this.value;
+
+updateCalendar(parseInt(this.value));
+
+};
+
+updateCalendar(1);
+
+
+/* OLD SYSTEM LOOP */
+
+gsap.to("#oldHoliday",{
+scale:1.2,
+repeat:-1,
+yoyo:true,
+duration:1
+});
+
+
+/* CHART */
+
+new Chart(document.getElementById("chart"),{
+
+type:"bar",
+
+data:{
+
+labels:["Static System","Rotation System"],
+
+datasets:[{
+
+label:"Life Satisfaction",
+
+data:[40,90],
+
+backgroundColor:["gray","#ff6f00"]
+
+}]
+
+},
+
+options:{
+responsive:true
+}
+
+});
+
+
+/* QUIZ */
+
+function showAnswer(){
+
+document.querySelector(".quiz-answer").style.display="block";
+
+}
+
+</script>
+
+</body>
+</html>
